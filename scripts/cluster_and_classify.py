@@ -97,17 +97,17 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--device", type=str, default='cuda:0',
                         help="device, e.g. cpu, cuda:0, cuda:1")
-    parser.add_argument("--latent_var_path", type=str, default="../rez",
+    parser.add_argument("--latent_var_path", type=str, default="re_z",
                         help="saved model path")
-    parser.add_argument("--model_path", type=str, default="../saved_model/SCVAE_savedmodel.pth",
+    parser.add_argument("--model_path", type=str, default="saved_model/SCVAE_savedmodel.pth",
                         help="saved model path")
-    parser.add_argument("--latent_mode", type=str, choices=['post', 'prior', 'predict', 'diff'], default='post',
+    parser.add_argument("--latent_mode", type=str, choices=['post', 'prior', 'predict', 'diff'], default='diff',
                         help="the mode of using latent variable")
     parser.add_argument("--is_trainsites", type=bool, default=True,
                         help="whether use trainsites or testsites")
     parser.add_argument("--anomaly_type", type=str, choices=["equipment_anomaly", "weather_equipment_2class", "whole_anomaly", "weather_anomaly"],
-                        default="weather_anomaly", help="The anomaly type to clustering or classification")
-    parser.add_argument("--task", type=str, choices=['clustering', 'classification'], default='classification',
+                        default="equipment_anomaly", help="The anomaly type to clustering or classification")
+    parser.add_argument("--task", type=str, choices=['clustering', 'classification'], default='clustering',
                         help="clustering or classification")
     parser.add_argument("--classifier", type=str, choices=['SVM', 'XGB', 'MLP'], default='XGB',
                         help="classification methods")
@@ -126,7 +126,7 @@ if __name__ == "__main__":
     classifier = ""
     task = opt.task
     mode = opt.latent_mode
-    latent_var_path=opt.latent_var_path
+    latent_var_path = opt.latent_var_path
 
     TSNE_flag = False
     if task == "clustering":
@@ -167,14 +167,19 @@ if __name__ == "__main__":
     print("average_normal_z.shape", average_normal_z.shape)
 
     if mode == "post":
-        normal_z = np.load(latent_var_path+"/re_post_zs_"+dataset+"_normal.npy")
+        normal_z = np.load(latent_var_path+"/re_post_zs_" +
+                           dataset+"_normal.npy")
     elif mode == "prior":
-        normal_z = np.load(latent_var_path+"/re_prior_zs_"+dataset+"_normal.npy")
+        normal_z = np.load(latent_var_path+"/re_prior_zs_" +
+                           dataset+"_normal.npy")
     elif mode == "predict":
-        normal_z = np.load(latent_var_path+"/re_predict_zs_"+dataset+"_normal.npy")
+        normal_z = np.load(
+            latent_var_path+"/re_predict_zs_"+dataset+"_normal.npy")
     elif mode == "diff":
-        normal_z1 = np.load(latent_var_path+"/re_post_zs_"+dataset+"_normal.npy")
-        normal_z2 = np.load(latent_var_path+"/re_prior_zs_"+dataset+"_normal.npy")
+        normal_z1 = np.load(
+            latent_var_path+"/re_post_zs_"+dataset+"_normal.npy")
+        normal_z2 = np.load(
+            latent_var_path+"/re_prior_zs_"+dataset+"_normal.npy")
         # normal_z2=np.load(latent_var_path+"/re_predict_zs_"+dataset+"_normal.npy")
         normal_z = normal_z1-normal_z2
 
@@ -212,10 +217,12 @@ if __name__ == "__main__":
     elif mode == "prior":
         spike_z = np.load(latent_var_path+"/re_prior_zs_"+dataset+"_spike.npy")
     elif mode == "predict":
-        spike_z = np.load(latent_var_path+"/re_predict_zs_"+dataset+"_spike.npy")
+        spike_z = np.load(latent_var_path+"/re_predict_zs_" +
+                          dataset+"_spike.npy")
     elif mode == "diff":
         spike_z1 = np.load(latent_var_path+"/re_post_zs_"+dataset+"_spike.npy")
-        spike_z2 = np.load(latent_var_path+"/re_prior_zs_"+dataset+"_spike.npy")
+        spike_z2 = np.load(
+            latent_var_path+"/re_prior_zs_"+dataset+"_spike.npy")
         # spike_z2=np.load(latent_var_path+"/re_predict_zs_"+dataset+"_spike.npy")
         spike_z = spike_z1-spike_z2
 
@@ -233,10 +240,12 @@ if __name__ == "__main__":
     elif mode == "prior":
         snowy_z = np.load(latent_var_path+"/re_prior_zs_"+dataset+"_snowy.npy")
     elif mode == "predict":
-        snowy_z = np.load(latent_var_path+"/re_predict_zs_"+dataset+"_snowy.npy")
+        snowy_z = np.load(latent_var_path+"/re_predict_zs_" +
+                          dataset+"_snowy.npy")
     elif mode == "diff":
         snowy_z1 = np.load(latent_var_path+"/re_post_zs_"+dataset+"_snowy.npy")
-        snowy_z2 = np.load(latent_var_path+"/re_prior_zs_"+dataset+"_snowy.npy")
+        snowy_z2 = np.load(
+            latent_var_path+"/re_prior_zs_"+dataset+"_snowy.npy")
         # snowy_z2=np.load(latent_var_path+"/re_predict_zs_"+dataset+"_snowy.npy")
         snowy_z = snowy_z1-snowy_z2
 
@@ -248,14 +257,19 @@ if __name__ == "__main__":
         label_snowy = np.ones((spike_z.shape[0]))*2
 
     if mode == "post":
-        cloudy_z = np.load(latent_var_path+"/re_post_zs_"+dataset+"_cloudy.npy")
+        cloudy_z = np.load(latent_var_path+"/re_post_zs_" +
+                           dataset+"_cloudy.npy")
     elif mode == "prior":
-        cloudy_z = np.load(latent_var_path+"/re_prior_zs_"+dataset+"_cloudy.npy")
+        cloudy_z = np.load(latent_var_path+"/re_prior_zs_" +
+                           dataset+"_cloudy.npy")
     elif mode == "predict":
-        cloudy_z = np.load(latent_var_path+"/re_predict_zs_"+dataset+"_cloudy.npy")
+        cloudy_z = np.load(
+            latent_var_path+"/re_predict_zs_"+dataset+"_cloudy.npy")
     elif mode == "diff":
-        cloudy_z1 = np.load(latent_var_path+"/re_post_zs_"+dataset+"_cloudy.npy")
-        cloudy_z2 = np.load(latent_var_path+"/re_prior_zs_"+dataset+"_cloudy.npy")
+        cloudy_z1 = np.load(
+            latent_var_path+"/re_post_zs_"+dataset+"_cloudy.npy")
+        cloudy_z2 = np.load(
+            latent_var_path+"/re_prior_zs_"+dataset+"_cloudy.npy")
         # cloudy_z2=np.load(latent_var_path+"/re_predict_zs_"+dataset+"_cloudy.npy")
         cloudy_z = cloudy_z1-cloudy_z2
 
@@ -268,14 +282,19 @@ if __name__ == "__main__":
         label_cloudy = np.ones((spike_z.shape[0]))*2
 
     if mode == "post":
-        lowValue_z = np.load(latent_var_path+"/re_post_zs_"+dataset+"_lowValue.npy")
+        lowValue_z = np.load(
+            latent_var_path+"/re_post_zs_"+dataset+"_lowValue.npy")
     elif mode == "prior":
-        lowValue_z = np.load(latent_var_path+"/re_prior_zs_"+dataset+"_lowValue.npy")
+        lowValue_z = np.load(
+            latent_var_path+"/re_prior_zs_"+dataset+"_lowValue.npy")
     elif mode == "predict":
-        lowValue_z = np.load(latent_var_path+"/re_predict_zs_"+dataset+"_lowValue.npy")
+        lowValue_z = np.load(
+            latent_var_path+"/re_predict_zs_"+dataset+"_lowValue.npy")
     elif mode == "diff":
-        lowValue_z1 = np.load(latent_var_path+"/re_post_zs_"+dataset+"_lowValue.npy")
-        lowValue_z2 = np.load(latent_var_path+"/re_prior_zs_"+dataset+"_lowValue.npy")
+        lowValue_z1 = np.load(
+            latent_var_path+"/re_post_zs_"+dataset+"_lowValue.npy")
+        lowValue_z2 = np.load(
+            latent_var_path+"/re_prior_zs_"+dataset+"_lowValue.npy")
         # lowValue_z2=np.load(latent_var_path+"/re_predict_zs_"+dataset+"_lowValue.npy")
         lowValue_z = lowValue_z1-lowValue_z2
 
@@ -288,14 +307,19 @@ if __name__ == "__main__":
         label_lowValue = np.ones((spike_z.shape[0]))*1
 
     if mode == "post":
-        shading_z = np.load(latent_var_path+"/re_post_zs_"+dataset+"_shading.npy")
+        shading_z = np.load(
+            latent_var_path+"/re_post_zs_"+dataset+"_shading.npy")
     elif mode == "prior":
-        shading_z = np.load(latent_var_path+"/re_prior_zs_"+dataset+"_shading.npy")
+        shading_z = np.load(
+            latent_var_path+"/re_prior_zs_"+dataset+"_shading.npy")
     elif mode == "predict":
-        shading_z = np.load(latent_var_path+"/re_predict_zs_"+dataset+"_shading.npy")
+        shading_z = np.load(
+            latent_var_path+"/re_predict_zs_"+dataset+"_shading.npy")
     elif mode == "diff":
-        shading_z1 = np.load(latent_var_path+"/re_post_zs_"+dataset+"_shading.npy")
-        shading_z2 = np.load(latent_var_path+"/re_prior_zs_"+dataset+"_shading.npy")
+        shading_z1 = np.load(
+            latent_var_path+"/re_post_zs_"+dataset+"_shading.npy")
+        shading_z2 = np.load(
+            latent_var_path+"/re_prior_zs_"+dataset+"_shading.npy")
         # shading_z2=np.load(latent_var_path+"/re_predict_zs_"+dataset+"_shading.npy")
         shading_z = shading_z1-shading_z2
 
@@ -362,7 +386,7 @@ if __name__ == "__main__":
 
         print(equipment_anomaly_detect_flag)
         fig = plot_embedding_2d(result, label,
-                                't-SNE embedding of the digits (time %.2fs)'
+                                't-SNE embedding of the latent variables (time %.2fs)'
                                 % (time() - t0), num_perclass, weather_equipment_2anomaly_flag, equipment_anomaly_detect_flag, weather_anomaly_detect_flag)  # f"imgs/{detect_mode_list[detect_mode_index]}_{mode}_{site}.png"
         plt.show()
 

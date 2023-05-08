@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+
+
+
 import os
 import sys
 import time
@@ -19,8 +22,9 @@ from sklearn.metrics import mean_squared_error
 from sklearn.metrics import roc_auc_score, average_precision_score
 
 import sys
-sys.path.append("..")
-from SCVAE_model.SCVAE_model import SCVAE
+#sys.path.append(sys.path[0]+"/../")
+sys.path.insert(0, sys.path[0]+"/../")
+from model.SCVAE_model import SCVAE
 
 
 def get_hidden_z(model, dataloader, case="", mode="post", site_type="trainsites"):
@@ -56,7 +60,7 @@ def get_hidden_z(model, dataloader, case="", mode="post", site_type="trainsites"
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model_path", type=str, default="../saved_model/SCVAE_savedmodel.pth",
+    parser.add_argument("--model_path", type=str, default="saved_model/SCVAE_savedmodel.pth",
                         help="saved model path")
     parser.add_argument("--reg", type=float, default=0,
                         help='smooth canonical intensity')
@@ -90,7 +94,7 @@ if __name__ == "__main__":
                         default=False, help="whether get scale data")
     parser.add_argument("--is_simulate_data", type=bool, default=True,
                         help="whether use simulate data or predict data")
-    parser.add_argument("--is_trainsites", type=bool, default=False,
+    parser.add_argument("--is_trainsites", type=bool, default=True,
                         help="whether use trainsites or testsites")
     parser.add_argument("--anomaly_type_detected", type=str,
                         default='all', help="The anomaly type to be detected")

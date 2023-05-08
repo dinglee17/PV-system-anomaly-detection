@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
+
 import os
 import sys
 import time
@@ -21,8 +22,8 @@ from sklearn.metrics import mean_squared_error
 from sklearn.metrics import roc_auc_score, average_precision_score
 
 import sys
-sys.path.append("..")
-from SCVAE_model.SCVAE_model import SCVAE
+sys.path.insert(0, sys.path[0]+"/../")
+from model.SCVAE_model import SCVAE
 
 
 def mean_relative_error(y_true, y_pred):
@@ -256,7 +257,7 @@ def draw_anomaly_withMask(ra, tprt, pow_, predict, label, index, y_label1, y_lab
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model_path", type=str, default="../saved_model/SCVAE_savedmodel.pth",
+    parser.add_argument("--model_path", type=str, default="saved_model/SCVAE_savedmodel.pth",
                         help="saved model path")
     parser.add_argument("--reg", type=float, default=0,
                         help='smooth canonical intensity')

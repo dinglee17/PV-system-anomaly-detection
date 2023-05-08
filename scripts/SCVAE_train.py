@@ -23,8 +23,8 @@ import argparse
 from scipy import stats
 
 import sys
-sys.path.append("..")
-from SCVAE_model.SCVAE_model import SCVAE
+sys.path.insert(0, sys.path[0]+"/../")
+from model.SCVAE_model import SCVAE
 
 #os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 
@@ -195,7 +195,7 @@ def predict(model, dataloader):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model_path", type=str, default="../saved_model/SCVAE_savedmodel.pth",
+    parser.add_argument("--model_path", type=str, default="saved_model/SCVAE_savedmodel.pth",
                         help="saved model path")
     parser.add_argument("--reg", type=float, default=0,
                         help='smooth canonical intensity')
