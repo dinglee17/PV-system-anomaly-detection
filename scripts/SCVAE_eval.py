@@ -261,7 +261,7 @@ if __name__ == "__main__":
                         default=False, help="whether get scale data")
     parser.add_argument("--is_simulate_data", type=bool, default=True,
                         help="whether use simulate data or predict data")
-    parser.add_argument("--anomaly_type_detected", type=str,
+    parser.add_argument("--anomaly_type_detected", type=str,choices=["all", "spike", "low_value", "no_output","shading", "cloudy", "snowy"],
                         default='all', help="The anomaly type to be detected")
     opt = parser.parse_args()
 
