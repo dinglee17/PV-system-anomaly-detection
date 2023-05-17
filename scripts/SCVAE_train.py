@@ -235,12 +235,10 @@ if __name__ == "__main__":
     ra_series_scale, pow_series_scale, tprt_series_scale = read_single_data_noScale(
         "enhance_12times_smooth_intense_normal_data_of_20trainsites_clean.csv", False)
 
-    print(ra_series_scale.shape)
     ra_per_day_seq = ra_series_scale.reshape(seq_shape)
     pow_per_day_seq = pow_series_scale.reshape(seq_shape)
     tprt_per_day_seq = tprt_series_scale.reshape(seq_shape)
 
-    print(pow_per_day_seq.shape)
 
     if len(list(anomaly_mask)) != 0:
         print("anomaly_mask not empty")

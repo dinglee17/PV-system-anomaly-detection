@@ -21,6 +21,7 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 from torch.utils.data import TensorDataset
+import os
 
 
 def plot_embedding(data, labels, title, num_perclass, agg_flag=False, equ_ano_flag=False, wea_ano_flag=False, savefig=None):
@@ -55,7 +56,7 @@ def plot_embedding(data, labels, title, num_perclass, agg_flag=False, equ_ano_fl
     print(patches)
     angle1 = 0
     angle2 = 60
-    ax.view_init(angle1, angle2)  # 初始化视角 angle1沿着y轴旋转,angle2沿着z轴旋转
+    ax.view_init(angle1, angle2) 
     ax.legend(handles=patches, loc='best', fontsize=20)
     # plt.xticks([])
     # plt.yticks([])
@@ -164,7 +165,6 @@ if __name__ == "__main__":
     # normal_z=normal_z[:,num:end,:]
     # normal_z=normal_z.reshape(normal_z.shape[0],-1)
     average_normal_z = normal_z.mean(axis=0)
-    print("average_normal_z.shape", average_normal_z.shape)
 
     if mode == "post":
         normal_z = np.load(latent_var_path+"/re_post_zs_" +
@@ -208,7 +208,7 @@ if __name__ == "__main__":
     # print(inverter_fault_z.shape)
     inverter_fault_z = inverter_fault_z.reshape(
         inverter_fault_z.shape[0], -1)
-    print(inverter_fault_z.shape)
+    #print(inverter_fault_z.shape)
     num_perclass = inverter_fault_z.shape[0]
     label_inverter_fault = np.ones((inverter_fault_z.shape[0]))
 
@@ -365,9 +365,8 @@ if __name__ == "__main__":
                                 label_cloudy, label_lowValue, label_shading], axis=0)
         label = label-1
 
-    print(data.shape)
-    print(label.shape)
-    print(label)
+
+    
 
     data_train, data_test, label_train, label_test = train_test_split(
         data, label, test_size=0.25, random_state=42, stratify=label)
@@ -380,24 +379,21 @@ if __name__ == "__main__":
         site = "testsite"
 
     if TSNE_flag == True:
+        print("Clustring using "+opt.latent_mode+" latent variabels"+" by TSNE please wait..")
         tsne = TSNE(n_components=3, init='pca', random_state=0)
         t0 = time()
         result = tsne.fit_transform(data)
 
-        print(equipment_anomaly_detect_flag)
+        #print(equipment_anomaly_detect_flag)
         fig = plot_embedding_2d(result, label,
                                 't-SNE embedding of the latent variables (time %.2fs)'
                                 % (time() - t0), num_perclass, weather_equipment_2anomaly_flag, equipment_anomaly_detect_flag, weather_anomaly_detect_flag)  # f"imgs/{detect_mode_list[detect_mode_index]}_{mode}_{site}.png"
         plt.show()
 
-    # print(clf.score(data_train, label_train)) #0.76 如果分为设备异常和天气异常 0.8858
-    # print(clf.score(data_test, label_test)) #0.75 0.8717
 
-    # svm二分类
     if classifier == "SVM":
 
-        # svm 多分类结果
-
+        print("Classification using "+opt.latent_mode+" latent variabels"+" by SVM please wait...")
         clf = make_pipeline(StandardScaler(), SVC(kernel="linear"))
         clf.fit(data_train, label_train)
         pred_y_train = clf.predict(data_train)
@@ -408,14 +404,14 @@ if __name__ == "__main__":
             label_test, pred_y_test))
 
     elif classifier == "XGB":
-
+        print("Classification using "+opt.latent_mode+" latent variabels"+" by XGB please wait...")
         #data_train,data_val,label_train,label_val = train_test_split(data_train,label_train,test_size=0.2, random_state=42,stratify=label_train)
 
         params = {
             'booster': 'gbtree',
-            'objective': 'multi:softmax',   # 回归任务设置为：'objective': 'reg:gamma',
+            'objective': 'multi:softmax',   
             # 'objective': 'reg:gamma',
-            'num_class': 6,      # 回归任务没有这个参数
+            'num_class': 6,      
             'gamma': 1,
             'max_depth': 5,
             'lambda': 1,
@@ -430,11 +426,9 @@ if __name__ == "__main__":
             'learning_rate': 0.1
         }
 
-        # print(type(params.items()))
         plst = list(params.items())
 
         #xlf = xgb.XGBClassifier(*plst)
-
         # grid_search
         #gsearch = GridSearchCV(xlf, param_grid=grid_search_params, scoring='accuracy', cv=3)
         #gsearch.fit(data_train, label_train)
@@ -460,7 +454,7 @@ if __name__ == "__main__":
     # MLP
 
     elif classifier == "MLP":
-
+        print("Classification using "+opt.latent_mode+" latent variabels"+" by MLP please wait...")
         device = torch.device(opt.device)
 
         class MLP(nn.Module):
@@ -519,7 +513,7 @@ if __name__ == "__main__":
             best_acc = 0.90
             for t in range(epochs):
                 print(f"Epoch {t+1}\n-------------------------------")
-                model.train()  # 设置训练和推理模式，防止两种模式之间弄混
+                model.train()
                 train_one_epoch(train_loader, model, loss_fn, optimizer)
                 model.eval()
                 val_acc = test_one_epoch(val_loader, model, loss_fn)

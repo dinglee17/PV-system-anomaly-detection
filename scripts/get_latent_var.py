@@ -167,7 +167,6 @@ if __name__ == "__main__":
         multi_y_train = np.stack([y_train], axis=3)
         multi_y_test = np.stack([y_test], axis=3)
 
-        print(f"data shape：{multi_x_train.shape}")
         x_dim = multi_x_train.shape[-1]
         y_dim = multi_y_train.shape[-1]
         h_dim = opt.h_dim

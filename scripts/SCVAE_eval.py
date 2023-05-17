@@ -111,36 +111,6 @@ def predict(model, dataloader):
         return mus, stds
 
 
-def get_hidden_z(model, dataloader, case="", mode="post"):
-    print("*"*20+"get hidden variable")
-    model.eval()
-    with torch.no_grad():
-        re_zs = []
-        for batch_idx, (data, y_data) in enumerate(dataloader):
-            # to (T,batch_size,feature_dim,input_dim)
-            data = data.permute(1, 0, 3, 2).to(device)
-            y_data = y_data.permute(1, 0, 3, 2).to(device)
-            model(data, y_data)
-            # print(mu.shape) #(1,72,3)
-            if mode == "post":
-                re_z = np.array([item.cpu().numpy() for item in model.Z_mean])
-            elif mode == "prior":
-                re_z = np.array([item.cpu().numpy() for item in model.pZ_mean])
-            elif mode == "predict":
-                re_z = np.array([item.cpu().numpy()
-                                 for item in model.Z_mean_predict])
-            re_z = np.transpose(re_z, (1, 0, 2))
-            print(re_z.shape)
-            re_zs.append(re_z)
-
-        re_zs = np.concatenate(re_zs, axis=0)
-
-        print("re_zs.shape", re_zs.shape)
-        save_dir = "re_z"
-        os.makedirs(save_dir, exist_ok=True)
-        np.save("re_z/re_"+mode+"_zs_enhance_testsites_12times_"+case, re_zs)
-        return re_zs
-
 
 def draw_anomal(ra, tprt, pow_, predict, label, index, y_label1, y_label2, savefig=None):
     fig = plt.figure(index, figsize=(20, 8))
@@ -287,8 +257,6 @@ if __name__ == "__main__":
                         default=False, help="whether use predict result ot not")
     parser.add_argument("--is_prior", type=bool, default=False,
                         help="whether use prior to reconstruct ot not")
-    parser.add_argument("--whether_get_z", type=bool,
-                        default=True, help="whether get hidden variables")
     parser.add_argument("--is_scale_data", type=bool,
                         default=False, help="whether get scale data")
     parser.add_argument("--is_simulate_data", type=bool, default=True,
@@ -297,7 +265,6 @@ if __name__ == "__main__":
                         default='all', help="The anomaly type to be detected")
     opt = parser.parse_args()
 
-    whether_get_z = opt.whether_get_z
     is_predict = opt.is_predict
     is_prior = opt.is_prior
     is_simulate = opt.is_simulate_data
@@ -393,10 +360,6 @@ if __name__ == "__main__":
     if len(list(anomaly_mask)) != 0:
         anomaly_mask = anomaly_mask_test
 
-    if whether_get_z == True:
-        for mode in ["prior", "predict", "post"]:
-            re_zs = get_hidden_z(model, show_dataloader,
-                                 case=case[case_index], mode=mode)
 
     if not is_predict:
         mus, stds, scores = reconstruct(
@@ -421,7 +384,6 @@ if __name__ == "__main__":
     anomal_score = local_relative_error(pow_transpose, predict_transpose)
     # anomal_score=max_absolute__error(pow_transpose,predict_transpose) #absolute_max_error
 
-    print("anomal_score.shape", anomal_score.shape)
 
     if len(list(anomaly_mask)) != 0:
         label = np.sum(anomaly_mask, axis=1)
@@ -445,7 +407,6 @@ if __name__ == "__main__":
             raise RuntimeError('AnomalyType Undifined')
 
         label_part = label[index]
-        print(label_part.shape)
         anomal_score = anomal_score[index]
         mus = mus[index]
         show_x = show_x[index]
@@ -458,6 +419,7 @@ if __name__ == "__main__":
         num = np.sum(label)
         roc = roc_auc_score(label, anomal_score)
         prc = average_precision_score(label, anomal_score)
+        print("the AUC_ROC and AUC_PR of "+ opt.anomaly_type_detected + " anomalies:")
         print("roc:", roc)
         print("prc:", prc)
 
@@ -467,10 +429,10 @@ if __name__ == "__main__":
     label = anomal_score.copy()
     label[label > percentile_1] = 1
     label[label <= percentile_1] = 0
-
+    
+    print("***************anomaly samples*****************")
     # anomaly samples
     anomal_inst = [i for i, j in enumerate(label) if j == 1]
-    print("len(anomal_inst)", len(anomal_inst))
     for i, anomal in enumerate(anomal_inst):
         model.eval()
         with torch.no_grad():
@@ -493,13 +455,12 @@ if __name__ == "__main__":
         else:
             draw_anomal(ra, tprt, pow_, predict_, 1, 2*i, 'pow', 'ra')
 
-    print(detect_anomaly)
+    print("***************normal samples*****************")
     percentile_2 = np.percentile(-anomal_score, nomal_ratio)
     label = -anomal_score.copy()
     label[label <= percentile_2] = 0
     label[label > percentile_2] = 1
     nomal_inst = [i for i, j in enumerate(label) if j == 1]
-    print("len(nomal_inst)", len(nomal_inst))
     for i, nomal in enumerate(nomal_inst):
         model.eval()
         with torch.no_grad():

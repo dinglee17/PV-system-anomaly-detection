@@ -33,7 +33,7 @@ The above training script saves checkpoints to `.pth` files in the "saved_model"
 Once you have a path to your model, you can evaluate your model's reconstruction results using synthesized data like so:
 
 ```
-python scripts/SCVAE_eval.py --model_path /path/to/model.pth --anomaly_type all
+python scripts/SCVAE_eval.py --model_path ./saved_model/SCVAE_savedmodel.pth --anomaly_type all
 ```
 
 ## Getting latent variables & Clustering and classfication
@@ -41,12 +41,12 @@ python scripts/SCVAE_eval.py --model_path /path/to/model.pth --anomaly_type all
 Once you have a path to your model, you can also get the latent variable s of synthesized data as its representations like so. The latent variables are saved as a set of .npy files in the "re_z" folder.
 
 ```
-python scripts/get_latent_var.py --model_path /path/to/model.pth
+python scripts/get_latent_var.py --model_path ./saved_model/SCVAE_savedmodel.pth --is_trainsites True
 ```
 
 Once you have a set of latent variables files, you can do some clustering and classification experiments to analysis these latent variables like so:
 
 ```
-python scripts/cluster_and_classify.py --latent_var_path ../rez --task clustering --anomaly_type whole_anomaly
-python scripts/cluster_and_classify.py latent_var_path ../rez --task classification --anomaly_type whole_anomaly --classifier XGB
+python scripts/cluster_and_classify.py --latent_var_path ./re_z --task clustering --latent_mode diff --anomaly_type whole_anomaly
+python scripts/cluster_and_classify.py --latent_var_path ./re_z --task classification --latent_mode diff --anomaly_type whole_anomaly --classifier XGB
 ```
